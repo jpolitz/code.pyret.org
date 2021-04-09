@@ -1228,6 +1228,14 @@ $(function() {
 
   });
 
+  const onRunHandlers = [];
+  function onRun(handler) {
+    onRunHandlers.push(handler);
+  }
+  function triggerOnRun() {
+    onRunHandlers.forEach(h => h());
+  }
+
   programLoaded.fin(function() {
     CPO.editor.focus();
     CPO.editor.cm.setOption("readOnly", false);
@@ -1241,6 +1249,8 @@ $(function() {
   CPO.cycleFocus = cycleFocus;
   CPO.say = say;
   CPO.sayAndForget = sayAndForget;
+  CPO.onRun = onRun;
+  CPO.triggerOnRun = triggerOnRun;
   makeEvents({ CPO: CPO, sendPort: window.parent, receivePort: window });
 
 });

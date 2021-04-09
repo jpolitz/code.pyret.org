@@ -19,8 +19,14 @@ function commSetup(config, messageCallback) {
   return { sendEvent };
 }
 
+function getCurrentState(config) {
+  return config.CPO.editor.cm.getValue();
+}
+
 function makeEvents(config) {
   const editor = config.CPO.editor;
+  const onRun = config.CPO.onRun;
+  const RUN_CODE = config.CPO.RUN_CODE;
 
   const comm = commSetup(config, onmessage);
 
@@ -31,14 +37,30 @@ function makeEvents(config) {
     if(change.origin === thisAPI) { return; }
     comm.sendEvent({
       type: "change",
-      change: change
+      change: change,
+      currentState: getCurrentState(config)
+    });
+  });
+
+  config.CPO.onRun(function() {
+    comm.sendEvent({
+      type: "run",
+      currentState: getCurrentState(config)
     });
   });
 
   function onmessage(message) {
     console.log("received: ", message);
-    if(message.type === "change") {
-      editor.cm.replaceRange(message.change.text, message.change.from, message.change.to, thisAPI);
+    switch(message.type) {
+      case "setContents":
+        editor.cm.setValue(message.text);
+        break;
+      case "change":
+        editor.cm.replaceRange(message.change.text, message.change.from, message.change.to, thisAPI);
+        break;
+      case "run":
+        window.RUN_CODE(editor.cm.getValue()); // TODO(don't require editor here, abstract more)
+        break;
     }
   }
 }
