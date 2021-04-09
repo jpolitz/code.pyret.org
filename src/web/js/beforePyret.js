@@ -1062,6 +1062,9 @@ $(function() {
     initialGas: 100,
     scrollPastEnd: true,
   });
+  if(params["get"]["editorContents"] && !(params["get"]["program"] || params["get"]["share"])) {
+    CPO.editor.cm.setValue(params["get"]["editorContents"]);
+  }
   CPO.editor.cm.setOption("readOnly", "nocursor");
   CPO.editor.cm.setOption("longLines", new Map());
   function removeShortenedLine(lineHandle) {
